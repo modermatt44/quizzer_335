@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:quizzer_335/quiz.dart';
 import 'package:vibration/vibration.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setPreferredOrientations(
+      [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown])
+      .then((_) {
+    runApp(const MyApp());
+  });
 }
 
 class MyApp extends StatelessWidget {
@@ -20,6 +26,9 @@ class MyApp extends StatelessWidget {
         useMaterial3: true,
       ),
       home: const MyHomePage(title: 'Quizzer'),
+      routes: {
+        '/quiz': (context) => const Quiz(name: ''),
+      }
     );
   }
 }
@@ -34,12 +43,20 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
 
+  var _name = '';
+
   void _startQuiz() async {
     if (await Vibration.hasVibrator() ?? false) {
       Vibration.vibrate(duration: 500);
     } else {
       HapticFeedback.heavyImpact();
     }
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => Quiz(name: _name),
+      ),
+    );
   }
 
   @override
@@ -80,16 +97,22 @@ class _MyHomePageState extends State<MyHomePage> {
                 const SizedBox(
                   height: 100,
                 ),
-                const TextField(
+                TextField(
                   maxLength: 20,
-                  decoration: InputDecoration(
+                  // Bind the text field to a variable
+                  onChanged: (text) {
+                    setState(() {
+                      _name = text;
+                    });
+                  },
+                  style: const TextStyle(color: Colors.white),
+                  maxLengthEnforcement: MaxLengthEnforcement.enforced,
+                  decoration: const InputDecoration(
                     border: OutlineInputBorder(borderSide: BorderSide(color: Colors.black)),
                     labelText: 'Enter your name',
-                    // Change the color of the border
                     focusedBorder: OutlineInputBorder(
                       borderSide: BorderSide(color: Colors.white),
                     ),
-                    // Change the color of the text
                     labelStyle: TextStyle(color: Colors.white),
                   ),
                 ),
@@ -107,7 +130,7 @@ class _MyHomePageState extends State<MyHomePage> {
                     ),
                     minimumSize: const Size(200, 50),
                   ),
-                  child: const Text('Enter Quizzer'),
+                  child: const Text('Enter Quizzer!'),
                 ),
               ],
             ),
