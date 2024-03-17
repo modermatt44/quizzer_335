@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'question.dart';
 import 'package:dropdown_search/dropdown_search.dart';
+import 'package:vibration/vibration.dart';
 
 class Quiz extends StatefulWidget {
   const Quiz({super.key, required this.name});
@@ -32,13 +33,29 @@ class Quiz extends StatefulWidget {
 
 class _QuizPageState extends State<Quiz> {
   late Future<List<Question>> futureQuestions;
+  late List<String> answers;
+
+  String selectedAnswer = '';
 
   List<String> _selectedCategories = [];
-  List<String> _selectedDifficulties = ['easy'];
+  List<String> _selectedDifficulties = ['easy', 'medium', 'hard'];
 
   void checkSelectedAnswer(String selectedAnswer, String correctAnswer) {
+    this.selectedAnswer = selectedAnswer;
     if (selectedAnswer == correctAnswer) {
+      Vibration.vibrate(duration: 100);
       print('Correct');
+      setState(() {
+        futureQuestions =
+            widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
+      });
+      futureQuestions = Quiz(name: widget.name)
+          .fetchQuestions(_selectedCategories, _selectedDifficulties);
+      futureQuestions.then((questions) {
+        answers = List<String>.from(questions[0].incorrectAnswers)
+          ..add(questions[0].correctAnswer);
+        answers.shuffle();
+      });
     } else {
       print('Incorrect');
     }
@@ -49,6 +66,11 @@ class _QuizPageState extends State<Quiz> {
     super.initState();
     futureQuestions = Quiz(name: widget.name)
         .fetchQuestions(_selectedCategories, _selectedDifficulties);
+    futureQuestions.then((questions) {
+      answers = List<String>.from(questions[0].incorrectAnswers)
+        ..add(questions[0].correctAnswer);
+      answers.shuffle();
+    });
   }
 
   @override
@@ -56,14 +78,9 @@ class _QuizPageState extends State<Quiz> {
     return Scaffold(
         resizeToAvoidBottomInset: false,
         body: FutureBuilder<List<Question>>(
-          future:
-          widget.fetchQuestions(_selectedCategories, _selectedDifficulties),
+          future: futureQuestions,
           builder: (context, snapshot) {
             if (snapshot.hasData) {
-              List<String> answers = List<String>.from(snapshot.data![0].incorrectAnswers)
-                ..add(snapshot.data![0].correctAnswer);
-              answers.shuffle();
-
               return Stack(
                 children: [
                   Container(
@@ -96,10 +113,17 @@ class _QuizPageState extends State<Quiz> {
                                   children: <Widget>[
                                     ElevatedButton(
                                       onPressed: () {
-                                        checkSelectedAnswer(answer, snapshot.data![0].correctAnswer);
+                                        checkSelectedAnswer(answer,
+                                            snapshot.data![0].correctAnswer);
                                       },
                                       style: ElevatedButton.styleFrom(
                                         minimumSize: const Size(500, 50),
+                                        backgroundColor:
+                                            answer == selectedAnswer && answer == snapshot.data![0].correctAnswer
+                                                ? Colors.green
+                                                : answer == selectedAnswer
+                                                ? Colors.red
+                                                : null,
                                       ),
                                       child: Text(answer),
                                     ),
@@ -115,8 +139,17 @@ class _QuizPageState extends State<Quiz> {
                             ),
                             ElevatedButton(
                               onPressed: () {
-                                widget.fetchQuestions(
-                                    _selectedCategories, _selectedDifficulties);
+                                setState(() {
+                                  futureQuestions =
+                                      widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
+                                });
+                                futureQuestions = Quiz(name: widget.name)
+                                    .fetchQuestions(_selectedCategories, _selectedDifficulties);
+                                futureQuestions.then((questions) {
+                                  answers = List<String>.from(questions[0].incorrectAnswers)
+                                    ..add(questions[0].correctAnswer);
+                                  answers.shuffle();
+                                });
                               },
                               child: const Text('Skip'),
                             ),
@@ -199,7 +232,7 @@ class SettingsDialog extends StatefulWidget {
 
 class _SettingsDialogState extends State<SettingsDialog> {
   List<String> _selectedCategories = [];
-  List<String> _selectedDifficulties = ['easy'];
+  List<String> _selectedDifficulties = ['easy', 'medium', 'hard'];
 
   final List<String> _categories = [
     "music",
