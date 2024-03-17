@@ -50,6 +50,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
     _controller = AnimationController(
       duration: const Duration(milliseconds: 100),
       vsync: this,

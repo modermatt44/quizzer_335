@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'question.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:vibration/vibration.dart';
+import 'reaction.dart';
 
 class Quiz extends StatefulWidget {
   const Quiz({super.key, required this.name});
@@ -153,13 +154,21 @@ class _QuizPageState extends State<Quiz> {
                               },
                               child: const Text('Skip'),
                             ),
+                            ElevatedButton(onPressed: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => const ReactionPage()),
+                              );
+                            },
+                                child: const Text('Reaction')
+                            ),
                           ],
                         ),
                       ),
                     ),
                   ),
                   Positioned(
-                    top: 30,
+                    top: 25,
                     left: 20,
                     child: IconButton(
                       onPressed: () {
