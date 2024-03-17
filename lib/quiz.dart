@@ -1,16 +1,19 @@
 import 'dart:convert';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'package:quizzer_335/main.dart';
 import 'question.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:vibration/vibration.dart';
 import 'reaction.dart';
 
 class Quiz extends StatefulWidget {
-  const Quiz({super.key, required this.name});
+  const Quiz({super.key, required this.name, required this.points});
 
   final String name;
+  final int points;
 
   Future<List<Question>> fetchQuestions(List<String> selectedCategories,
       List<String> selectedDifficulties) async {
@@ -41,16 +44,20 @@ class _QuizPageState extends State<Quiz> {
   List<String> _selectedCategories = [];
   List<String> _selectedDifficulties = ['easy', 'medium', 'hard'];
 
+  int _points = 0;
+
   void checkSelectedAnswer(String selectedAnswer, String correctAnswer) {
+    setState(() {
     this.selectedAnswer = selectedAnswer;
     if (selectedAnswer == correctAnswer) {
       Vibration.vibrate(duration: 100);
+
+      _points += 10;
+
       print('Correct');
-      setState(() {
-        futureQuestions =
-            widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
-      });
-      futureQuestions = Quiz(name: widget.name)
+      futureQuestions =
+          widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
+      futureQuestions = Quiz(name: widget.name, points: _points)
           .fetchQuestions(_selectedCategories, _selectedDifficulties);
       futureQuestions.then((questions) {
         answers = List<String>.from(questions[0].incorrectAnswers)
@@ -58,14 +65,19 @@ class _QuizPageState extends State<Quiz> {
         answers.shuffle();
       });
     } else {
+      if (_points > 0){
+        _points -= 5;
+      }
       print('Incorrect');
     }
+    });
   }
 
   @override
   void initState() {
     super.initState();
-    futureQuestions = Quiz(name: widget.name)
+    _points = widget.points;
+    futureQuestions = Quiz(name: widget.name, points: widget.points)
         .fetchQuestions(_selectedCategories, _selectedDifficulties);
     futureQuestions.then((questions) {
       answers = List<String>.from(questions[0].incorrectAnswers)
@@ -97,10 +109,18 @@ class _QuizPageState extends State<Quiz> {
                       padding: const EdgeInsets.all(20.0),
                       child: SingleChildScrollView(
                         child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: <Widget>[
                             const SizedBox(
-                              height: 100,
+                              height: 15,
+                            ),
+                            Text('Points: $_points',
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold)),
+                            const SizedBox(
+                              height: 50,
                             ),
                             Text(snapshot.data![0].questionText,
                                 style: const TextStyle(
@@ -120,11 +140,14 @@ class _QuizPageState extends State<Quiz> {
                                       style: ElevatedButton.styleFrom(
                                         minimumSize: const Size(500, 50),
                                         backgroundColor:
-                                            answer == selectedAnswer && answer == snapshot.data![0].correctAnswer
+                                            answer == selectedAnswer &&
+                                                    answer ==
+                                                        snapshot.data![0]
+                                                            .correctAnswer
                                                 ? Colors.green
                                                 : answer == selectedAnswer
-                                                ? Colors.red
-                                                : null,
+                                                    ? Colors.red
+                                                    : null,
                                       ),
                                       child: Text(answer),
                                     ),
@@ -141,27 +164,32 @@ class _QuizPageState extends State<Quiz> {
                             ElevatedButton(
                               onPressed: () {
                                 setState(() {
-                                  futureQuestions =
-                                      widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
+                                  futureQuestions = widget.fetchQuestions(
+                                      _selectedCategories,
+                                      _selectedDifficulties);
                                 });
-                                futureQuestions = Quiz(name: widget.name)
-                                    .fetchQuestions(_selectedCategories, _selectedDifficulties);
+                                futureQuestions = Quiz(name: widget.name, points: _points)
+                                    .fetchQuestions(_selectedCategories,
+                                        _selectedDifficulties);
                                 futureQuestions.then((questions) {
-                                  answers = List<String>.from(questions[0].incorrectAnswers)
+                                  answers = List<String>.from(
+                                      questions[0].incorrectAnswers)
                                     ..add(questions[0].correctAnswer);
                                   answers.shuffle();
                                 });
                               },
                               child: const Text('Skip'),
                             ),
-                            ElevatedButton(onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) => const ReactionPage()),
-                              );
-                            },
-                                child: const Text('Reaction')
-                            ),
+                            ElevatedButton(
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) =>
+                                            ReactionPage(currentPoints: _points, currentName: widget.name,)),
+                                  );
+                                },
+                                child: const Text('Reaction')),
                           ],
                         ),
                       ),
@@ -199,13 +227,21 @@ class _QuizPageState extends State<Quiz> {
                     ),
                   ),
                   Positioned(
-                    top: 30,
-                    right: 20,
-                    child: Text(
-                      widget.name,
-                      style: const TextStyle(color: Colors.white, fontSize: 20),
-                    ),
-                  ),
+                      top: 35,
+                      right: 20,
+                      child: SizedBox(
+                        width: 100,
+                        child: Text(
+                          widget.name,
+                          style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      )),
                 ],
               );
             } else if (snapshot.hasError) {
@@ -310,6 +346,10 @@ class _SettingsDialogState extends State<SettingsDialog> {
         ],
       ),
       actions: <Widget>[
+        TextButton(onPressed: () {
+          Navigator.push(context, MaterialPageRoute(builder: (context) => const MyApp()));
+        },
+            child: const Text('Logout')),
         TextButton(
           child: const Text('Close'),
           onPressed: () {

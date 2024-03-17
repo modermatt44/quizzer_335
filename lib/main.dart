@@ -27,7 +27,7 @@ class MyApp extends StatelessWidget {
         ),
         home: const MyHomePage(title: 'Quizzer'),
         routes: {
-          '/quiz': (context) => const Quiz(name: ''),
+          '/quiz': (context) => const Quiz(name: '', points: 0),
         }
     );
   }
@@ -77,7 +77,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Quiz(name: _name),
+        builder: (context) => Quiz(name: _name, points: 0,),
       ),
     );
   }
