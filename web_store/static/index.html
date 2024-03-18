@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Get Quizzer</title>
+</head>
+<body>
+    <div id="flex">
+        <img id="logo" src="logo_color.png" alt="Quizzer Logo">
+        <h1>Description</h1>
+        <p>Quizzer 335 is a trivia quiz application built with Flutter and Dart. The application fetches questions from an API and presents them to the user. Points are awarded for correct answers and deducted for incorrect ones.
+        </p>
+        <h1>Screenshots</h1>
+        <div id="flex-img">
+            <img src="mainPage.jpg" alt="Main Page">
+            <img src="quizPage.jpg" alt="Quiz Page">
+            <img src="settingsPage.jpg" alt="Settings Page">
+            <img src="reactionPage.jpg" alt="Reaction Page">
+        </div>
+    </div>
+</body>
+<style>
+    body{
+        font-family: Arial,serif;
+        width: 50%;
+        text-align: center;
+    }
+    #flex{
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+    }
+    #flex-img{
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-right: auto;
+        justify-content: center;
+    }
+    #logo{
+        border-radius: 100px;
+        width: 200px;
+        height: 200px;
+    }
+</style>
+</html>
