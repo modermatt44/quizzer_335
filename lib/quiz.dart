@@ -190,20 +190,6 @@ class _QuizPageState extends State<Quiz> {
                                 },
                                 child: const Text('Skip'),
                               ),
-                              ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              ReactionPage(
-                                                currentPoints: _points,
-                                                currentName: widget.name,
-                                              )
-                                      ),
-                                    );
-                                  },
-                                  child: const Text('Reaction')),
                             ],
                           ),
                         ),

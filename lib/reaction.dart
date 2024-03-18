@@ -67,7 +67,7 @@ class _ReactionPageState extends State<ReactionPage> {
           );
         });
       });
-    });
+    }, shakeThresholdGravity: 1.5);
     timer = Timer.periodic(const Duration(milliseconds: 1), (Timer t) {
       setState(() {
         elapsedReaction = stopWatchReaction.elapsed.inMilliseconds;
