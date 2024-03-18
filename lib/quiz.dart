@@ -7,6 +7,7 @@ import 'question.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'package:vibration/vibration.dart';
 import 'reaction.dart';
+import 'dart:math' as math;
 
 class Quiz extends StatefulWidget {
   const Quiz({super.key, required this.name, required this.points});
@@ -46,8 +47,9 @@ class _QuizPageState extends State<Quiz> {
 
   void checkSelectedAnswer(String selectedAnswer, String correctAnswer) {
     setState(() {
-    this.selectedAnswer = selectedAnswer;
-    if (selectedAnswer == correctAnswer) {
+      int randomReaction = math.Random().nextInt(10);
+      this.selectedAnswer = selectedAnswer;
+      if (selectedAnswer == correctAnswer) {
       Vibration.vibrate(duration: 100);
 
       _points += 10;
@@ -61,6 +63,16 @@ class _QuizPageState extends State<Quiz> {
           ..add(questions[0].correctAnswer);
         answers.shuffle();
       });
+      if (randomReaction == 5){
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+              builder: (context) => ReactionPage(
+                currentPoints: _points,
+                currentName: widget.name,
+              )),
+        );
+      }
     } else {
       if (_points > 0){
         _points -= 5;
@@ -86,170 +98,178 @@ class _QuizPageState extends State<Quiz> {
   Widget build(BuildContext context) {
     return Scaffold(
         resizeToAvoidBottomInset: false,
-        body: FutureBuilder<List<Question>>(
-          future: futureQuestions,
-          builder: (context, snapshot) {
-            if (snapshot.hasData) {
-              return Stack(
-                children: [
-                  Container(
-                    height: double.infinity,
-                    width: double.infinity,
-                    decoration: const BoxDecoration(
-                      image: DecorationImage(
-                        image: AssetImage('assets/images/v859-katie-11.jpg'),
-                        fit: BoxFit.cover,
+        body: PopScope(
+          canPop: false,
+          child: FutureBuilder<List<Question>>(
+            future: futureQuestions,
+            builder: (context, snapshot) {
+              if (snapshot.hasData) {
+                return Stack(
+                  children: [
+                    Container(
+                      height: double.infinity,
+                      width: double.infinity,
+                      decoration: const BoxDecoration(
+                        image: DecorationImage(
+                          image: AssetImage('assets/images/v859-katie-11.jpg'),
+                          fit: BoxFit.cover,
+                        ),
                       ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: <Widget>[
-                            const SizedBox(
-                              height: 15,
-                            ),
-                            Text('Points: $_points',
-                                style: const TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.bold)),
-                            const SizedBox(
-                              height: 50,
-                            ),
-                            Text(snapshot.data![0].questionText,
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 30)),
-                            const SizedBox(
-                              height: 50,
-                            ),
-                            Column(
-                              children: answers.map((answer) {
-                                return Column(
-                                  children: <Widget>[
-                                    ElevatedButton(
-                                      onPressed: () {
-                                        checkSelectedAnswer(answer,
-                                            snapshot.data![0].correctAnswer);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        minimumSize: const Size(500, 50),
-                                        backgroundColor:
-                                            answer == selectedAnswer &&
-                                                    answer ==
-                                                        snapshot.data![0]
-                                                            .correctAnswer
-                                                ? Colors.green
-                                                : answer == selectedAnswer
-                                                    ? Colors.red
-                                                    : null,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: SingleChildScrollView(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            children: <Widget>[
+                              const SizedBox(
+                                height: 15,
+                              ),
+                              Text('Points: $_points',
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold)),
+                              const SizedBox(
+                                height: 50,
+                              ),
+                              Text(snapshot.data![0].questionText,
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 30)),
+                              const SizedBox(
+                                height: 50,
+                              ),
+                              Column(
+                                children: answers.map((answer) {
+                                  return Column(
+                                    children: <Widget>[
+                                      ElevatedButton(
+                                        onPressed: () {
+                                          checkSelectedAnswer(answer,
+                                              snapshot.data![0].correctAnswer);
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          minimumSize: const Size(500, 50),
+                                          backgroundColor:
+                                          answer == selectedAnswer &&
+                                              answer ==
+                                                  snapshot.data![0]
+                                                      .correctAnswer
+                                              ? Colors.green
+                                              : answer == selectedAnswer
+                                              ? Colors.red
+                                              : null,
+                                        ),
+                                        child: Text(answer),
                                       ),
-                                      child: Text(answer),
-                                    ),
-                                    const SizedBox(
-                                      height: 20,
-                                    ),
-                                  ],
-                                );
-                              }).toList(),
-                            ),
-                            const SizedBox(
-                              height: 100,
-                            ),
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  futureQuestions = widget.fetchQuestions(
-                                      _selectedCategories,
-                                      _selectedDifficulties);
-                                });
-                                futureQuestions = Quiz(name: widget.name, points: _points)
-                                    .fetchQuestions(_selectedCategories,
-                                        _selectedDifficulties);
-                                futureQuestions.then((questions) {
-                                  answers = List<String>.from(
-                                      questions[0].incorrectAnswers)
-                                    ..add(questions[0].correctAnswer);
-                                  answers.shuffle();
-                                });
-                              },
-                              child: const Text('Skip'),
-                            ),
-                            ElevatedButton(
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) =>
-                                            ReactionPage(currentPoints: _points, currentName: widget.name,)),
+                                      const SizedBox(
+                                        height: 20,
+                                      ),
+                                    ],
                                   );
+                                }).toList(),
+                              ),
+                              const SizedBox(
+                                height: 100,
+                              ),
+                              ElevatedButton(
+                                onPressed: () {
+                                  setState(() {
+                                    futureQuestions = widget.fetchQuestions(
+                                        _selectedCategories,
+                                        _selectedDifficulties);
+                                  });
+                                  futureQuestions = Quiz(name: widget.name, points: _points)
+                                      .fetchQuestions(_selectedCategories,
+                                      _selectedDifficulties);
+                                  futureQuestions.then((questions) {
+                                    answers = List<String>.from(
+                                        questions[0].incorrectAnswers)
+                                      ..add(questions[0].correctAnswer);
+                                    answers.shuffle();
+                                  });
                                 },
-                                child: const Text('Reaction')),
-                          ],
+                                child: const Text('Skip'),
+                              ),
+                              ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) =>
+                                              ReactionPage(
+                                                currentPoints: _points,
+                                                currentName: widget.name,
+                                              )
+                                      ),
+                                    );
+                                  },
+                                  child: const Text('Reaction')),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    top: 25,
-                    left: 20,
-                    child: IconButton(
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return SettingsDialog(
-                              selectedCategories: _selectedCategories,
-                              selectedDifficulties: _selectedDifficulties,
-                              onCategoriesChanged: (categories) {
-                                setState(() {
-                                  _selectedCategories = categories;
-                                });
-                              },
-                              onDifficultiesChanged: (difficulties) {
-                                setState(() {
-                                  _selectedDifficulties = difficulties;
-                                });
-                              },
-                            );
-                          },
-                        );
-                      },
-                      icon: const Icon(Icons.settings),
-                      alignment: Alignment.center,
-                      iconSize: 30,
-                      color: Colors.white,
+                    Positioned(
+                      top: 25,
+                      left: 20,
+                      child: IconButton(
+                        onPressed: () {
+                          showDialog(
+                            context: context,
+                            builder: (BuildContext context) {
+                              return SettingsDialog(
+                                selectedCategories: _selectedCategories,
+                                selectedDifficulties: _selectedDifficulties,
+                                onCategoriesChanged: (categories) {
+                                  setState(() {
+                                    _selectedCategories = categories;
+                                  });
+                                },
+                                onDifficultiesChanged: (difficulties) {
+                                  setState(() {
+                                    _selectedDifficulties = difficulties;
+                                  });
+                                },
+                              );
+                            },
+                          );
+                        },
+                        icon: const Icon(Icons.settings),
+                        alignment: Alignment.center,
+                        iconSize: 30,
+                        color: Colors.white,
+                      ),
                     ),
-                  ),
-                  Positioned(
-                      top: 35,
-                      right: 20,
-                      child: SizedBox(
-                        width: 100,
-                        child: Text(
-                          widget.name,
-                          style: const TextStyle(
+                    Positioned(
+                        top: 35,
+                        right: 20,
+                        child: SizedBox(
+                          width: 100,
+                          child: Text(
+                            widget.name,
+                            style: const TextStyle(
                               color: Colors.white,
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               fontStyle: FontStyle.italic,
+                            ),
+                            textAlign: TextAlign.center,
                           ),
-                          textAlign: TextAlign.center,
-                        ),
-                      )),
-                ],
-              );
-            } else if (snapshot.hasError) {
-              return Text('${snapshot.error}');
-            }
+                        )),
+                  ],
+                );
+              } else if (snapshot.hasError) {
+                return Text('${snapshot.error}');
+              }
 
-            // By default, show a loading spinner.
-            return const Center(
-              child: CircularProgressIndicator(),
-            );
-          },
-        ));
+              // By default, show a loading spinner.
+              return const Center(
+                child: CircularProgressIndicator(),
+              );
+            },
+          ),
+        )
+        );
   }
 }
 
