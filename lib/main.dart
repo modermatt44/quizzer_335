@@ -91,7 +91,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
           child: Container(
               decoration: const BoxDecoration(
                 image: DecorationImage(
-                  image: AssetImage('assets/images/v859-katie-11.jpg'),
+                  image: AssetImage('assets/images/v859_katie_11.jpg'),
                   fit: BoxFit.cover,
                 ),
               ),
@@ -113,7 +113,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
                             width: 5,
                           ),
                           image: const DecorationImage(
-                            image: AssetImage('assets/images/logo-color.png'),
+                            image: AssetImage('assets/images/logo_color.png'),
                             fit: BoxFit.cover,
                           ),
                           borderRadius: BorderRadius.circular(100),

@@ -1,6 +1,6 @@
 # Quizzer 335
 
-![Logo](assets/images/logo-color.png)
+![Logo](assets/images/logo_color.png)
 AI generated Logo
 
 Quizzer 335 is a trivia quiz application built with Flutter and Dart. The application fetches questions from an API and presents them to the user. The user can select an answer from the given options. Points are awarded for correct answers and deducted for incorrect ones.

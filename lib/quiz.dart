@@ -111,7 +111,7 @@ class _QuizPageState extends State<Quiz> {
                       width: double.infinity,
                       decoration: const BoxDecoration(
                         image: DecorationImage(
-                          image: AssetImage('assets/images/v859-katie-11.jpg'),
+                          image: AssetImage('assets/images/v859_katie_11.jpg'),
                           fit: BoxFit.cover,
                         ),
                       ),
