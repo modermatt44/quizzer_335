@@ -35,3 +35,11 @@ To get a local copy up and running, follow these steps:
 ## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any contributions you make are greatly appreciated.
+
+## Testkonzept und Testprotokoll
+
+Das Testkonzept und das Testprotokoll sind im Verzeichnis `testing` zu finden.
+
+## Diagramme
+
+Die Diagramme sind im Verzeichnis `diagrams` zu finden.
