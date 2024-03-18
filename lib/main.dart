@@ -61,7 +61,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
       });
   }
 
-  void _startQuiz() async {
+  Future<void> _startQuiz() async {
     if (_name.isEmpty) {
       _controller.forward().then((_) => _controller.reverse());
       setState(() {

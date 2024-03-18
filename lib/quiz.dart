@@ -2,12 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:quizzer_335/main.dart';
 import 'question.dart';
-import 'package:dropdown_search/dropdown_search.dart';
 import 'package:vibration/vibration.dart';
 import 'reaction.dart';
 import 'dart:math' as math;
+import 'settings.dart';
 
 class Quiz extends StatefulWidget {
   const Quiz({super.key, required this.name, required this.points});
@@ -17,7 +16,7 @@ class Quiz extends StatefulWidget {
 
   Future<List<Question>> fetchQuestions(List<String> selectedCategories,
       List<String> selectedDifficulties) async {
-    String url =
+    final String url =
         'https://the-trivia-api.com/v2/questions?categories=${selectedCategories.join(',')}&difficulties=${selectedDifficulties.join(',')}&limit=1';
     final response = await http.get(Uri.parse(url));
 
@@ -45,17 +44,9 @@ class _QuizPageState extends State<Quiz> {
 
   int _points = 0;
 
-  void checkSelectedAnswer(String selectedAnswer, String correctAnswer) {
+  void prepareForNextQuestion() {
     setState(() {
-      int randomReaction = math.Random().nextInt(10);
-      this.selectedAnswer = selectedAnswer;
-      if (selectedAnswer == correctAnswer) {
-      Vibration.vibrate(duration: 100);
-
-      _points += 10;
-
-      futureQuestions =
-          widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
+      futureQuestions = widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
       futureQuestions = Quiz(name: widget.name, points: _points)
           .fetchQuestions(_selectedCategories, _selectedDifficulties);
       futureQuestions.then((questions) {
@@ -63,6 +54,20 @@ class _QuizPageState extends State<Quiz> {
           ..add(questions[0].correctAnswer);
         answers.shuffle();
       });
+    });
+  }
+
+  void checkSelectedAnswer(String selectedAnswer, String correctAnswer) {
+    setState(() {
+      final int randomReaction = math.Random().nextInt(10);
+      this.selectedAnswer = selectedAnswer;
+      if (selectedAnswer == correctAnswer) {
+      Vibration.vibrate(duration: 100);
+
+      _points += 10;
+
+      prepareForNextQuestion();
+
       if (randomReaction == 5){
         Navigator.push(
           context,
@@ -85,13 +90,7 @@ class _QuizPageState extends State<Quiz> {
   void initState() {
     super.initState();
     _points = widget.points;
-    futureQuestions = Quiz(name: widget.name, points: widget.points)
-        .fetchQuestions(_selectedCategories, _selectedDifficulties);
-    futureQuestions.then((questions) {
-      answers = List<String>.from(questions[0].incorrectAnswers)
-        ..add(questions[0].correctAnswer);
-      answers.shuffle();
-    });
+    prepareForNextQuestion();
   }
 
   @override
@@ -174,18 +173,10 @@ class _QuizPageState extends State<Quiz> {
                               ElevatedButton(
                                 onPressed: () {
                                   setState(() {
-                                    futureQuestions = widget.fetchQuestions(
-                                        _selectedCategories,
-                                        _selectedDifficulties);
-                                  });
-                                  futureQuestions = Quiz(name: widget.name, points: _points)
-                                      .fetchQuestions(_selectedCategories,
-                                      _selectedDifficulties);
-                                  futureQuestions.then((questions) {
-                                    answers = List<String>.from(
-                                        questions[0].incorrectAnswers)
-                                      ..add(questions[0].correctAnswer);
-                                    answers.shuffle();
+                                    prepareForNextQuestion();
+                                    if (_points > 0){
+                                      _points -= 5;
+                                    }
                                   });
                                 },
                                 child: const Text('Skip'),
@@ -256,109 +247,5 @@ class _QuizPageState extends State<Quiz> {
           ),
         )
         );
-  }
-}
-
-class SettingsDialog extends StatefulWidget {
-  const SettingsDialog({
-    super.key,
-    required this.selectedCategories,
-    required this.selectedDifficulties,
-    required this.onCategoriesChanged,
-    required this.onDifficultiesChanged,
-  });
-
-  final List<String> selectedCategories;
-  final List<String> selectedDifficulties;
-  final ValueChanged<List<String>> onCategoriesChanged;
-  final ValueChanged<List<String>> onDifficultiesChanged;
-
-  @override
-  State<SettingsDialog> createState() => _SettingsDialogState();
-}
-
-class _SettingsDialogState extends State<SettingsDialog> {
-  List<String> _selectedCategories = [];
-  List<String> _selectedDifficulties = ['easy', 'medium', 'hard'];
-
-  final List<String> _categories = [
-    "music",
-    "sport_and_leisure",
-    "film_and_tv",
-    "arts_and_literature",
-    "history",
-    "society_and_culture",
-    "science",
-    "geography",
-    "food_and_drink",
-    "general_knowledge"
-  ];
-  final List<String> _difficulties = ['easy', 'medium', 'hard'];
-
-  @override
-  void initState() {
-    super.initState();
-    _selectedCategories = widget.selectedCategories;
-    _selectedDifficulties = widget.selectedDifficulties;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      title: const Text('Settings'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          DropdownSearch<String>.multiSelection(
-            popupProps: const PopupPropsMultiSelection.menu(
-              showSelectedItems: true,
-            ),
-            items: _categories,
-            dropdownDecoratorProps: const DropDownDecoratorProps(
-              dropdownSearchDecoration: InputDecoration(
-                labelText: "Select Categories",
-              ),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _selectedCategories = value;
-              });
-              widget.onCategoriesChanged(_selectedCategories);
-            },
-            selectedItems: _selectedCategories,
-          ),
-          DropdownSearch<String>.multiSelection(
-            popupProps: const PopupPropsMultiSelection.menu(
-              showSelectedItems: true,
-            ),
-            items: _difficulties,
-            dropdownDecoratorProps: const DropDownDecoratorProps(
-              dropdownSearchDecoration: InputDecoration(
-                labelText: "Select Difficulties",
-              ),
-            ),
-            onChanged: (value) {
-              setState(() {
-                _selectedDifficulties = value;
-              });
-              widget.onDifficultiesChanged(_selectedDifficulties);
-            },
-            selectedItems: _selectedDifficulties,
-          ),
-        ],
-      ),
-      actions: <Widget>[
-        TextButton(onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const MyApp()));
-        },
-            child: const Text('Logout')),
-        TextButton(
-          child: const Text('Close'),
-          onPressed: () {
-            Navigator.of(context).pop();
-          },
-        ),
-      ],
-    );
   }
 }
