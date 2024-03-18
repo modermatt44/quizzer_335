@@ -15,3 +15,7 @@
 # Note
 
 Beim Test `Frage überspringen` wurde im Testkonzept festgelegt, dass das erwartete Ergebniss `Eine neue Frage wird nun angezeigt.` ist. Jedoch wurde die funktionalität des `Skip` button so angepasst, dass nun auch 5 Punkte abgezogen werden.
+
+# Link zum Testkonzept
+
+[Hier](test_konzept.pdf) ist das Testkonzept zu finden.
