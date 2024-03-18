@@ -50,7 +50,6 @@ class _ReactionPageState extends State<ReactionPage> {
     _points = widget.currentPoints;
     _name = widget.currentName;
 
-    int points = widget.currentPoints;
     stopWatchReaction.start();
     detector = ShakeDetector.autoStart(onPhoneShake: () {
       setState(() {
@@ -72,7 +71,6 @@ class _ReactionPageState extends State<ReactionPage> {
     timer = Timer.periodic(const Duration(milliseconds: 1), (Timer t) {
       setState(() {
         elapsedReaction = stopWatchReaction.elapsed.inMilliseconds;
-        print(elapsedReaction);
       });
     });
   }

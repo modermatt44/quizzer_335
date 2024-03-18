@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:quizzer_335/main.dart';
@@ -22,7 +21,6 @@ class Quiz extends StatefulWidget {
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
-      print(url);
       return (jsonDecode(response.body) as List<dynamic>)
           .map((item) => Question.fromJson(item as Map<String, dynamic>))
           .toList();
@@ -54,7 +52,6 @@ class _QuizPageState extends State<Quiz> {
 
       _points += 10;
 
-      print('Correct');
       futureQuestions =
           widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
       futureQuestions = Quiz(name: widget.name, points: _points)
@@ -68,7 +65,6 @@ class _QuizPageState extends State<Quiz> {
       if (_points > 0){
         _points -= 5;
       }
-      print('Incorrect');
     }
     });
   }
