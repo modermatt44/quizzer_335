@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:quizzer_335/quiz.dart';
 import 'package:vibration/vibration.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -42,14 +43,24 @@ class MyHomePage extends StatefulWidget {
 }
 
 class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateMixin {
-  var _name = '';
+  String _name = '';
   late AnimationController _controller;
   late Animation _animation;
   Color _borderColor = Colors.black;
 
+  late final SharedPreferences prefs;
+
+  late int sharedPoints;
+
+  Future<void> initSharedPoints() async {
+    prefs = await SharedPreferences.getInstance();
+    sharedPoints = prefs.getInt('sharedPoints') ?? 0;
+  }
+
   @override
   void initState() {
     super.initState();
+    initSharedPoints();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.manual, overlays: [SystemUiOverlay.top]);
     _controller = AnimationController(
       duration: const Duration(milliseconds: 100),
@@ -77,7 +88,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => Quiz(name: _name, points: 0,),
+        builder: (context) => Quiz(name: _name, points: sharedPoints,),
       ),
     );
   }

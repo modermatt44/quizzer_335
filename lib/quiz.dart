@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'question.dart';
 import 'package:vibration/vibration.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'reaction.dart';
 import 'dart:math' as math;
 import 'settings.dart';
@@ -42,11 +43,22 @@ class _QuizPageState extends State<Quiz> {
   List<String> _selectedCategories = [];
   List<String> _selectedDifficulties = ['easy', 'medium', 'hard'];
 
+  late final SharedPreferences prefs;
+
+  late int finalPoints;
+
+  Future<void> initSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    prefs.setInt('sharedPoints', widget.points);
+    finalPoints = prefs.getInt('sharedPoints') ?? 0;
+  }
+
   int _points = 0;
 
   void prepareForNextQuestion() {
     setState(() {
-      futureQuestions = widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
+      futureQuestions =
+          widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
       futureQuestions = Quiz(name: widget.name, points: _points)
           .fetchQuestions(_selectedCategories, _selectedDifficulties);
       futureQuestions.then((questions) {
@@ -62,33 +74,42 @@ class _QuizPageState extends State<Quiz> {
       final int randomReaction = math.Random().nextInt(10);
       this.selectedAnswer = selectedAnswer;
       if (selectedAnswer == correctAnswer) {
-      Vibration.vibrate(duration: 100);
+        Vibration.vibrate(duration: 100);
 
-      _points += 10;
+        _points += 10;
 
-      prepareForNextQuestion();
+        prefs.setInt('sharedPoints', _points);
 
-      if (randomReaction == 5){
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-              builder: (context) => ReactionPage(
-                currentPoints: _points,
-                currentName: widget.name,
-              )),
-        );
+        finalPoints = prefs.getInt('sharedPoints') ?? 0;
+
+        prepareForNextQuestion();
+
+        if (randomReaction == 5) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => ReactionPage(
+                      currentPoints: _points,
+                      currentName: widget.name,
+                    )),
+          );
+        }
+      } else {
+        if (_points > 0) {
+          _points -= 5;
+
+          prefs.setInt('sharedPoints', _points);
+
+          finalPoints = prefs.getInt('sharedPoints') ?? 0;
+        }
       }
-    } else {
-      if (_points > 0){
-        _points -= 5;
-      }
-    }
     });
   }
 
   @override
   void initState() {
     super.initState();
+    initSharedPrefs();
     _points = widget.points;
     prepareForNextQuestion();
   }
@@ -123,7 +144,7 @@ class _QuizPageState extends State<Quiz> {
                               const SizedBox(
                                 height: 15,
                               ),
-                              Text('Points: $_points',
+                              Text('Points: $finalPoints',
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 20,
@@ -149,14 +170,14 @@ class _QuizPageState extends State<Quiz> {
                                         style: ElevatedButton.styleFrom(
                                           minimumSize: const Size(500, 50),
                                           backgroundColor:
-                                          answer == selectedAnswer &&
-                                              answer ==
-                                                  snapshot.data![0]
-                                                      .correctAnswer
-                                              ? Colors.green
-                                              : answer == selectedAnswer
-                                              ? Colors.red
-                                              : null,
+                                              answer == selectedAnswer &&
+                                                      answer ==
+                                                          snapshot.data![0]
+                                                              .correctAnswer
+                                                  ? Colors.green
+                                                  : answer == selectedAnswer
+                                                      ? Colors.red
+                                                      : null,
                                         ),
                                         child: Text(answer),
                                       ),
@@ -174,8 +195,10 @@ class _QuizPageState extends State<Quiz> {
                                 onPressed: () {
                                   setState(() {
                                     prepareForNextQuestion();
-                                    if (_points > 0){
+                                    if (_points > 0) {
                                       _points -= 5;
+                                      prefs.setInt('sharedPoints', _points);
+                                      finalPoints = prefs.getInt('sharedPoints') ?? 0;
                                     }
                                   });
                                 },
@@ -245,7 +268,6 @@ class _QuizPageState extends State<Quiz> {
               );
             },
           ),
-        )
-        );
+        ));
   }
 }

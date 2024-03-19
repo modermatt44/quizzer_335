@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:dropdown_search/dropdown_search.dart';
 import 'main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsDialog extends StatefulWidget {
   const SettingsDialog({
@@ -37,6 +38,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
     'general_knowledge'
   ];
   final List<String> _difficulties = ['easy', 'medium', 'hard'];
+
+  Future<void> clearSharedPrefs() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    prefs.clear();
+  }
 
   @override
   void initState() {
@@ -92,6 +98,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
       ),
       actions: <Widget>[
         TextButton(onPressed: () {
+          clearSharedPrefs();
           Navigator.push(context, MaterialPageRoute(builder: (context) => const MyApp()));
         },
             child: const Text('Logout')),
