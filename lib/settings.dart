@@ -41,7 +41,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
 
   Future<void> clearSharedPrefs() async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.clear();
+    prefs.setInt('sharedPoints', 0);
+    prefs.setString('sharedName', '');
   }
 
   @override
@@ -101,7 +102,7 @@ class _SettingsDialogState extends State<SettingsDialog> {
           clearSharedPrefs();
           Navigator.push(context, MaterialPageRoute(builder: (context) => const MyApp()));
         },
-            child: const Text('Logout')),
+            child: const Text('Reset')),
         TextButton(
           child: const Text('Close'),
           onPressed: () {

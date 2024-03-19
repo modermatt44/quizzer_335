@@ -2,11 +2,11 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:shake/shake.dart';
 import 'quiz.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ReactionPage extends StatefulWidget {
-  const ReactionPage({super.key, required this.currentPoints, required this.currentName});
+  const ReactionPage({super.key, required this.currentName});
 
-  final int currentPoints;
   final String currentName;
 
   @override
@@ -14,40 +14,46 @@ class ReactionPage extends StatefulWidget {
 }
 
 class _ReactionPageState extends State<ReactionPage> {
+
+  late final SharedPreferences prefs;
+
   int elapsedReaction = 0;
   Stopwatch stopWatchReaction = Stopwatch();
   Timer? timer;
   late ShakeDetector detector;
 
-  int _points = 0;
+  late int finalPoints;
   String _name = '';
 
-  void calculatePoints() {
-    if (elapsedReaction < 200) {
-      _points += 100;
-    } else if (elapsedReaction < 300) {
-      _points += 80;
-    } else if (elapsedReaction < 400) {
-      _points += 60;
-    } else if (elapsedReaction < 500) {
-      _points += 50;
-    } else if (elapsedReaction < 600) {
-      _points += 20;
-    } else if (elapsedReaction < 700) {
-      _points += 10;
-    } else if (elapsedReaction < 800) {
-      _points += 5;
-    } else if (elapsedReaction < 900) {
-      _points += 0;
-    } else if (elapsedReaction > 900) {
-      _points -= 5;
-    }
+  Future<void> calculatePoints() async{
+      prefs = await SharedPreferences.getInstance();
+      finalPoints = prefs.getInt('sharedPoints') ?? 0;
+      if (elapsedReaction < 200) {
+        prefs.setInt('sharedPoints', finalPoints += 100);
+      } else if (elapsedReaction < 300) {
+        prefs.setInt('sharedPoints', finalPoints += 80);
+      } else if (elapsedReaction < 400) {
+        prefs.setInt('sharedPoints', finalPoints += 60);
+      } else if (elapsedReaction < 500) {
+        prefs.setInt('sharedPoints', finalPoints += 50);
+      } else if (elapsedReaction < 600) {
+        prefs.setInt('sharedPoints', finalPoints += 40);
+      } else if (elapsedReaction < 700) {
+        prefs.setInt('sharedPoints', finalPoints += 20);
+      } else if (elapsedReaction < 800) {
+        prefs.setInt('sharedPoints', finalPoints += 10);
+      } else if (elapsedReaction < 900) {
+        prefs.setInt('sharedPoints', finalPoints += 0);
+      } else if (elapsedReaction > 900 && finalPoints > 5) {
+        prefs.setInt('sharedPoints', finalPoints -= 5);
+      } else {
+        prefs.setInt('sharedPoints', finalPoints -= 0);
+      }
   }
 
   @override
   void initState() {
     super.initState();
-    _points = widget.currentPoints;
     _name = widget.currentName;
 
     stopWatchReaction.start();
@@ -62,7 +68,7 @@ class _ReactionPageState extends State<ReactionPage> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => Quiz(name: _name, points: _points),
+              builder: (context) => Quiz(name: _name),
             ),
           );
         });

@@ -10,10 +10,9 @@ import 'dart:math' as math;
 import 'settings.dart';
 
 class Quiz extends StatefulWidget {
-  const Quiz({super.key, required this.name, required this.points});
+  const Quiz({super.key, required this.name});
 
   final String name;
-  final int points;
 
   Future<List<Question>> fetchQuestions(List<String> selectedCategories,
       List<String> selectedDifficulties) async {
@@ -45,21 +44,18 @@ class _QuizPageState extends State<Quiz> {
 
   late final SharedPreferences prefs;
 
-  late int finalPoints;
+  late int points;
 
   Future<void> initSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
-    prefs.setInt('sharedPoints', widget.points);
-    finalPoints = prefs.getInt('sharedPoints') ?? 0;
+    points = prefs.getInt('sharedPoints') ?? 0;
   }
-
-  int _points = 0;
 
   void prepareForNextQuestion() {
     setState(() {
       futureQuestions =
           widget.fetchQuestions(_selectedCategories, _selectedDifficulties);
-      futureQuestions = Quiz(name: widget.name, points: _points)
+      futureQuestions = Quiz(name: widget.name)
           .fetchQuestions(_selectedCategories, _selectedDifficulties);
       futureQuestions.then((questions) {
         answers = List<String>.from(questions[0].incorrectAnswers)
@@ -71,37 +67,32 @@ class _QuizPageState extends State<Quiz> {
 
   void checkSelectedAnswer(String selectedAnswer, String correctAnswer) {
     setState(() {
-      final int randomReaction = math.Random().nextInt(10);
+      final int randomReaction = math.Random().nextInt(3);
       this.selectedAnswer = selectedAnswer;
       if (selectedAnswer == correctAnswer) {
         Vibration.vibrate(duration: 100);
 
-        _points += 10;
+        points += 10;
 
-        prefs.setInt('sharedPoints', _points);
+        prefs.setInt('sharedPoints', points);
 
-        finalPoints = prefs.getInt('sharedPoints') ?? 0;
+        points = prefs.getInt('sharedPoints') ?? 0;
 
         prepareForNextQuestion();
 
-        if (randomReaction == 5) {
+        if (randomReaction == 2) {
           Navigator.push(
             context,
             MaterialPageRoute(
                 builder: (context) => ReactionPage(
-                      currentPoints: _points,
                       currentName: widget.name,
                     )),
           );
         }
-      } else {
-        if (_points > 0) {
-          _points -= 5;
-
-          prefs.setInt('sharedPoints', _points);
-
-          finalPoints = prefs.getInt('sharedPoints') ?? 0;
-        }
+      } else if (points > 0) {
+        points -= 5;
+        prefs.setInt('sharedPoints', points);
+        points = prefs.getInt('sharedPoints') ?? 0;
       }
     });
   }
@@ -110,7 +101,6 @@ class _QuizPageState extends State<Quiz> {
   void initState() {
     super.initState();
     initSharedPrefs();
-    _points = widget.points;
     prepareForNextQuestion();
   }
 
@@ -144,7 +134,7 @@ class _QuizPageState extends State<Quiz> {
                               const SizedBox(
                                 height: 15,
                               ),
-                              Text('Points: $finalPoints',
+                              Text('Points: $points',
                                   style: const TextStyle(
                                       color: Colors.white,
                                       fontSize: 20,
@@ -195,10 +185,11 @@ class _QuizPageState extends State<Quiz> {
                                 onPressed: () {
                                   setState(() {
                                     prepareForNextQuestion();
-                                    if (_points > 0) {
-                                      _points -= 5;
-                                      prefs.setInt('sharedPoints', _points);
-                                      finalPoints = prefs.getInt('sharedPoints') ?? 0;
+                                    if (points > 0) {
+                                      points -= 5;
+                                      prefs.setInt('sharedPoints', points);
+                                      points =
+                                          prefs.getInt('sharedPoints') ?? 0;
                                     }
                                   });
                                 },

@@ -6,7 +6,7 @@ Mein Ziel war es, eine Quiz-App zu entwickeln, die es den Benutzern ermöglicht,
 
 ## B. Beschreibung des Resultats (IST)
 
-Die Quiz-App wurde erfolgreich entwickelt und getestet. Sie enthält die geplanten Funktionen, einschließlich der Möglichkeit, Kategorien und Schwierigkeitsgrade zu filtern, Punkte zu sammeln und ein Reaktionsspiel zu spielen. Die App wurde mit Flutter in Dart entwickelt und verwendet verschiedene Pakete, darunter `http`, `dropdown_search`, `vibration`, `shake` und `cupertino_icons`.
+Die Quiz-App wurde erfolgreich entwickelt und getestet. Sie enthält die geplanten Funktionen, einschliesslich der Möglichkeit, Kategorien und Schwierigkeitsgrade zu filtern, Punkte zu sammeln und ein Reaktionsspiel zu spielen. Die App wurde mit Flutter in Dart entwickelt und verwendet verschiedene Pakete, darunter `http`, `dropdown_search`, `vibration`, `shake` und `cupertino_icons`.
 
 ## C. Beschreibung der Erkenntnis
 
