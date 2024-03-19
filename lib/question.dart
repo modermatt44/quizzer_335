@@ -18,7 +18,8 @@ class Question {
       category: json['category'] as String,
       id: json['id'] as String,
       correctAnswer: json['correctAnswer'] as String,
-      incorrectAnswers: (json['incorrectAnswers'] as List<dynamic>).cast<String>(),
+      incorrectAnswers: (json['incorrectAnswers'] as List<dynamic>)
+          .cast<String>(),
       questionText: json['question']['text'] as String,
     );
   }

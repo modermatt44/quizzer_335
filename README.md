@@ -43,3 +43,8 @@ Das Testkonzept und das Testprotokoll sind im Verzeichnis `testing` zu finden.
 ## Diagramme
 
 Die Diagramme sind im Verzeichnis `diagrams` zu finden.
+
+## Info zu linter
+
+Der Linter wurde mithilfe von `flutter_linter` konfiguriert. Die Konfiguration ist im Verzeichnis `analysis_options.yaml` zu finden. Jedoch ist es per se nicht möglich eine rule zu aktivieren, welche verhindert, dass eine Methode länger als 30 Zeilen ist, oder, dass alle Variablen und Methoden in Englisch bennant werden. Auch gibt es keine rule um CamelCase zu erzwingen. Es wäre jedoch möglich eine eigene rule zu schreiben, welche dies erzwingt. Dies ist aber ziemlich komplex und würde den Rahmen dieses Projektes sprengen. 
+Link zu docs für custom rules: [Custom Linter Rules](https://invertase.io/blog/custom-linter-rules)

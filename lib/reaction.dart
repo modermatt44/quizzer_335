@@ -55,7 +55,6 @@ class _ReactionPageState extends State<ReactionPage> {
   void initState() {
     super.initState();
     _name = widget.currentName;
-
     stopWatchReaction.start();
     detector = ShakeDetector.autoStart(onPhoneShake: () {
       setState(() {
@@ -106,9 +105,11 @@ class _ReactionPageState extends State<ReactionPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: <Widget>[
-                const Text('Shake your phone to stop the timer!', style: TextStyle(fontSize: 30)),
+                const Text('Shake your phone to stop the timer!', 
+                    style: TextStyle(fontSize: 30)),
                 const SizedBox(height: 20),
-                Text('$elapsedReaction ms', style: const TextStyle(fontSize: 24, color: Colors.red)),
+                Text('$elapsedReaction ms',
+                    style: const TextStyle(fontSize: 24, color: Colors.red)),
               ],
             ),
           ),

@@ -49,14 +49,16 @@ class _SettingsDialogState extends State<SettingsDialog> {
     await prefs.setString('sharedName', '');
     await prefs.setStringList('sharedCategories', []);
     await prefs.setStringList('sharedDifficulties', ['easy', 'medium', 'hard']);
-    Navigator.push(context, MaterialPageRoute(builder: (context) => const MyApp()));
+    Navigator.push(context, MaterialPageRoute(
+        builder: (context) => const MyApp()));
   }
 
   Future<void> initSharedPrefs() async {
     prefs = await SharedPreferences.getInstance();
     setState(() {
       sharedSelectedCategories = prefs.getStringList('sharedCategories') ?? [];
-      sharedSelectedDifficulties = prefs.getStringList('sharedDifficulties') ?? ['easy', 'medium', 'hard'];
+      sharedSelectedDifficulties = prefs.getStringList('sharedDifficulties') ??
+          ['easy', 'medium', 'hard'];
     });
   }
 
@@ -125,7 +127,8 @@ class _SettingsDialogState extends State<SettingsDialog> {
       actions: <Widget>[
         TextButton(onPressed: () {
           reset();
-          Navigator.push(context, MaterialPageRoute(builder: (context) => const MyApp()));
+          Navigator.push(context, MaterialPageRoute(
+              builder: (context) => const MyApp()));
         },
             child: const Text('Reset')),
         TextButton(

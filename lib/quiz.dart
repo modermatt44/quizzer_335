@@ -17,7 +17,8 @@ class Quiz extends StatefulWidget {
   Future<List<Question>> fetchQuestions(List<String> selectedCategories,
       List<String> selectedDifficulties) async {
     final String url =
-        'https://the-trivia-api.com/v2/questions?categories=${selectedCategories.join(',')}&difficulties=${selectedDifficulties.join(',')}&limit=1';
+        'https://the-trivia-api.com/v2/questions?categories=${selectedCategories
+        .join(',')}&difficulties=${selectedDifficulties.join(',')}&limit=1';
     final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
@@ -71,15 +72,10 @@ class _QuizPageState extends State<Quiz> {
       this.selectedAnswer = selectedAnswer;
       if (selectedAnswer == correctAnswer) {
         Vibration.vibrate(duration: 100);
-
         points += 10;
-
         prefs.setInt('sharedPoints', points);
-
         points = prefs.getInt('sharedPoints') ?? 0;
-
         prepareForNextQuestion();
-
         if (randomReaction == 2) {
           Navigator.push(
             context,
