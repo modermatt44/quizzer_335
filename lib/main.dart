@@ -77,6 +77,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   void newGame() {
     prefs.setInt('sharedPoints', 0);
     prefs.setString('sharedName', '');
+    prefs.setStringList('sharedCategories', []);
+    prefs.setStringList('sharedDifficulties', ['easy', 'medium', 'hard']);
     setState(() {
       sharedPoints = 0;
       sharedName = '';

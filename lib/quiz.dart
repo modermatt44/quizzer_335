@@ -67,7 +67,7 @@ class _QuizPageState extends State<Quiz> {
 
   void checkSelectedAnswer(String selectedAnswer, String correctAnswer) {
     setState(() {
-      final int randomReaction = math.Random().nextInt(3);
+      final int randomReaction = math.Random().nextInt(10);
       this.selectedAnswer = selectedAnswer;
       if (selectedAnswer == correctAnswer) {
         Vibration.vibrate(duration: 100);

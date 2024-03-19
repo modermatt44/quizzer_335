@@ -25,6 +25,11 @@ class _SettingsDialogState extends State<SettingsDialog> {
   List<String> _selectedCategories = [];
   List<String> _selectedDifficulties = ['easy', 'medium', 'hard'];
 
+  late final SharedPreferences prefs;
+
+  List<String> sharedSelectedCategories = [];
+  List<String> sharedSelectedDifficulties = [];
+
   final List<String> _categories = [
     'music',
     'sport_and_leisure',
@@ -39,15 +44,26 @@ class _SettingsDialogState extends State<SettingsDialog> {
   ];
   final List<String> _difficulties = ['easy', 'medium', 'hard'];
 
-  Future<void> clearSharedPrefs() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setInt('sharedPoints', 0);
-    prefs.setString('sharedName', '');
+  Future<void> reset() async {
+    await prefs.setInt('sharedPoints', 0);
+    await prefs.setString('sharedName', '');
+    await prefs.setStringList('sharedCategories', []);
+    await prefs.setStringList('sharedDifficulties', ['easy', 'medium', 'hard']);
+    Navigator.push(context, MaterialPageRoute(builder: (context) => const MyApp()));
+  }
+
+  Future<void> initSharedPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    setState(() {
+      sharedSelectedCategories = prefs.getStringList('sharedCategories') ?? [];
+      sharedSelectedDifficulties = prefs.getStringList('sharedDifficulties') ?? ['easy', 'medium', 'hard'];
+    });
   }
 
   @override
   void initState() {
     super.initState();
+    initSharedPrefs();
     _selectedCategories = widget.selectedCategories;
     _selectedDifficulties = widget.selectedDifficulties;
   }
@@ -71,13 +87,21 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             onChanged: (value) {
               setState(() {
+                prefs.setStringList('sharedCategories', value);
                 _selectedCategories = value;
               });
               widget.onCategoriesChanged(_selectedCategories);
             },
-            selectedItems: _selectedCategories,
+            selectedItems: sharedSelectedCategories,
           ),
           DropdownSearch<String>.multiSelection(
+            autoValidateMode: AutovalidateMode.onUserInteraction,
+            validator: (value) {
+              if (value == null || value.isEmpty) {
+                return 'Please select at least one difficulty';
+              }
+              return null;
+            },
             popupProps: const PopupPropsMultiSelection.menu(
               showSelectedItems: true,
             ),
@@ -89,17 +113,18 @@ class _SettingsDialogState extends State<SettingsDialog> {
             ),
             onChanged: (value) {
               setState(() {
+                prefs.setStringList('sharedDifficulties', value);
                 _selectedDifficulties = value;
               });
               widget.onDifficultiesChanged(_selectedDifficulties);
             },
-            selectedItems: _selectedDifficulties,
+            selectedItems: sharedSelectedDifficulties,
           ),
         ],
       ),
       actions: <Widget>[
         TextButton(onPressed: () {
-          clearSharedPrefs();
+          reset();
           Navigator.push(context, MaterialPageRoute(builder: (context) => const MyApp()));
         },
             child: const Text('Reset')),
